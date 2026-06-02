@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Ejecuta la aplicación Spring Boot con variables de entorno para la conexión MySQL 8.0.
+# Ejecuta la aplicación Spring Boot con variables de entorno para la conexión PostgreSQL.
 # Uso: ./run.sh [opciones]
 #
 # Variables de entorno requeridas:
-#   DB_URL        URL JDBC de MySQL  (ej: jdbc:mysql://localhost:3306/mydb)
+#   DB_URL        URL JDBC de PostgreSQL  (ej: jdbc:postgresql://localhost:5432/mydb)
 #   DB_USERNAME   Usuario de la base de datos
 #   DB_PASSWORD   Contraseña de la base de datos
 #
 # Variables de entorno opcionales (tienen valores por defecto):
-#   DB_DRIVER     Driver JDBC        (default: com.mysql.cj.jdbc.Driver)
-#   DB_DIALECT    Dialecto Hibernate (default: org.hibernate.dialect.MySQLDialect)
+#   DB_DRIVER     Driver JDBC        (default: org.postgresql.Driver)
+#   DB_DIALECT    Dialecto Hibernate (default: org.hibernate.dialect.PostgreSQLDialect)
 #   DDL_AUTO      Estrategia DDL     (default: create-drop)
 #   SHOW_SQL      Mostrar SQL        (default: true)
 #   FORMAT_SQL    Formatear SQL      (default: false)
@@ -17,8 +17,8 @@
 #   DB_POOL_MIN_IDLE  Mín conexiones HikariCP (default: 5)
 #
 # Ejemplo de uso rápido:
-#   DB_URL="jdbc:mysql://localhost:3306/mydb" \
-#   DB_USERNAME="root" \
+#   DB_URL="jdbc:postgresql://localhost:5432/mydb" \
+#   DB_USERNAME="postgres" \
 #   DB_PASSWORD="secret" \
 #   ./run.sh
 
@@ -38,8 +38,8 @@ warn()  { echo -e "${YELLOW}[WARN]${RESET}  $*"; }
 error() { echo -e "${RED}[ERROR]${RESET} $*" >&2; }
 
 # ── Valores por defecto ────────────────────────────────────────────────────────
-export DB_DRIVER="${DB_DRIVER:-com.mysql.cj.jdbc.Driver}"
-export DB_DIALECT="${DB_DIALECT:-org.hibernate.dialect.MySQLDialect}"
+export DB_DRIVER="${DB_DRIVER:-org.postgresql.Driver}"
+export DB_DIALECT="${DB_DIALECT:-org.hibernate.dialect.PostgreSQLDialect}"
 export DDL_AUTO="${DDL_AUTO:-create-drop}"
 export SHOW_SQL="${SHOW_SQL:-true}"
 export FORMAT_SQL="${FORMAT_SQL:-false}"
@@ -50,7 +50,7 @@ export DB_POOL_MIN_IDLE="${DB_POOL_MIN_IDLE:-5}"
 MISSING=0
 
 if [[ -z "${DB_URL:-}" ]]; then
-  error "DB_URL no está definida. Ejemplo: jdbc:mysql://localhost:3306/mydb"
+  error "DB_URL no está definida. Ejemplo: jdbc:postgresql://localhost:5432/mydb"
   MISSING=1
 fi
 
@@ -69,8 +69,8 @@ if [[ $MISSING -eq 1 ]]; then
   error "Falta al menos una variable de entorno requerida. Abortando."
   echo ""
   echo "  Uso:"
-  echo "    DB_URL=\"jdbc:mysql://localhost:3306/mydb\" \\"
-  echo "    DB_USERNAME=\"root\" \\"
+  echo "    DB_URL=\"jdbc:postgresql://localhost:5432/mydb\" \\"
+  echo "    DB_USERNAME=\"postgres\" \\"
   echo "    DB_PASSWORD=\"secret\" \\"
   echo "    ./run.sh"
   exit 1

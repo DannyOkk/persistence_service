@@ -2,52 +2,52 @@ package ar.edu.um.fi.ingsr.persistence.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ar.edu.um.fi.ingsr.persistence.repository.UserRepository;
-import ar.edu.um.fi.ingsr.persistence.domain.User;
 import org.springframework.transaction.annotation.Transactional;
+
+import ar.edu.um.fi.ingsr.persistence.domain.User;
+import ar.edu.um.fi.ingsr.persistence.repository.UserRepository;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Transactional(readOnly = false)
+    private final UserRepository userRepository;          // cambio: inyección por constructor
+
+    public UserService(UserRepository userRepository) {   // cambio: constructor en vez de @Autowired
+        this.userRepository = userRepository;
+    }
+
+    @Transactional
     public User save(User user) {
         return userRepository.saveAndFlush(user);
     }
-    
+
+    @Transactional(readOnly = true)
     public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found: " + id)); // cambio: null → excepción
     }
-//TODO ejemplo de mal aplicado por la inteligencia artificial
-    public User findByEmailUser(String email) {
-        return userRepository.findAll().stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
-            
-    }
+
+    // ELIMINADO: findByEmailUser — cargaba todos los usuarios en memoria y filtraba en Java
+
     @Transactional(readOnly = true)
     public User findByEmail(String email) {
-        return userRepository.findFirstByEmail(email).orElse(null);
-        
-        } 
-    
-        public void deleteById(Long id) {
+        return userRepository.findFirstByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email)); // cambio: null → excepción
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public User update(User user) {
         return userRepository.saveAndFlush(user);
     }
-
-    
-
 }

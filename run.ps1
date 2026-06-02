@@ -1,13 +1,13 @@
-# Ejecuta la aplicación Spring Boot con variables de entorno para la conexión MySQL 8.0.
+# Ejecuta la aplicación Spring Boot con variables de entorno para la conexión PostgreSQL.
 #
 # Variables de entorno requeridas:
-#   DB_URL        URL JDBC de MySQL  (ej: jdbc:mysql://localhost:3306/mydb)
+#   DB_URL        URL JDBC de PostgreSQL  (ej: jdbc:postgresql://localhost:5432/mydb)
 #   DB_USERNAME   Usuario de la base de datos
 #   DB_PASSWORD   Contraseña de la base de datos
 #
 # Variables de entorno opcionales (tienen valores por defecto):
-#   DB_DRIVER         Driver JDBC        (default: com.mysql.cj.jdbc.Driver)
-#   DB_DIALECT        Dialecto Hibernate (default: org.hibernate.dialect.MySQLDialect)
+#   DB_DRIVER         Driver JDBC        (default: org.postgresql.Driver)
+#   DB_DIALECT        Dialecto Hibernate (default: org.hibernate.dialect.PostgreSQLDialect)
 #   DDL_AUTO          Estrategia DDL     (default: create-drop)
 #   SHOW_SQL          Mostrar SQL        (default: true)
 #   FORMAT_SQL        Formatear SQL      (default: false)
@@ -15,8 +15,8 @@
 #   DB_POOL_MIN_IDLE  Mín conexiones HikariCP (default: 5)
 #
 # Ejemplo de uso:
-#   $env:DB_URL      = "jdbc:mysql://localhost:3306/mydb"
-#   $env:DB_USERNAME = "root"
+#   $env:DB_URL      = "jdbc:postgresql://localhost:5432/mydb"
+#   $env:DB_USERNAME = "postgres"
 #   $env:DB_PASSWORD = "secret"
 #   .\run.ps1
 
@@ -32,8 +32,8 @@ function Write-Warn  { param([string]$Msg) Write-Host "[WARN]  $Msg" -Foreground
 function Write-Err   { param([string]$Msg) Write-Host "[ERROR] $Msg" -ForegroundColor Red }
 
 # ── Valores por defecto ────────────────────────────────────────────────────────
-if (-not $env:DB_DRIVER)        { $env:DB_DRIVER        = "com.mysql.cj.jdbc.Driver" }
-if (-not $env:DB_DIALECT)       { $env:DB_DIALECT       = "org.hibernate.dialect.MySQLDialect" }
+if (-not $env:DB_DRIVER)        { $env:DB_DRIVER        = "org.postgresql.Driver" }
+if (-not $env:DB_DIALECT)       { $env:DB_DIALECT       = "org.hibernate.dialect.PostgreSQLDialect" }
 if (-not $env:DDL_AUTO)         { $env:DDL_AUTO         = "create-drop" }
 if (-not $env:SHOW_SQL)         { $env:SHOW_SQL         = "true" }
 if (-not $env:FORMAT_SQL)       { $env:FORMAT_SQL       = "false" }
@@ -44,7 +44,7 @@ if (-not $env:DB_POOL_MIN_IDLE) { $env:DB_POOL_MIN_IDLE = "5" }
 $missing = $false
 
 if (-not $env:DB_URL) {
-    Write-Err "DB_URL no está definida. Ejemplo: jdbc:mysql://localhost:3306/mydb"
+    Write-Err "DB_URL no está definida. Ejemplo: jdbc:postgresql://localhost:5432/mydb"
     $missing = $true
 }
 if (-not $env:DB_USERNAME) {
@@ -61,8 +61,8 @@ if ($missing) {
     Write-Err "Falta al menos una variable de entorno requerida. Abortando."
     Write-Host ""
     Write-Host "  Uso:"
-    Write-Host '    $env:DB_URL      = "jdbc:mysql://localhost:3306/mydb"'
-    Write-Host '    $env:DB_USERNAME = "root"'
+    Write-Host '    $env:DB_URL      = "jdbc:postgresql://localhost:5432/mydb"'
+    Write-Host '    $env:DB_USERNAME = "postgres"'
     Write-Host '    $env:DB_PASSWORD = "secret"'
     Write-Host '    .\run.ps1'
     exit 1

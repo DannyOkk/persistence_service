@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;  // cambio: import nuevo
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean                                                             // cambio: @MockBean → @MockitoBean
     private UserService userService;
 
     @Autowired
@@ -54,12 +54,10 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
-
-
     @Test
     public void testCreateUserValidationError() throws Exception {
         Map<String, String> payload = new HashMap<>();
-        payload.put("email", "invalid-email"); // invalid email format
+        payload.put("email", "invalid-email");
 
         mockMvc.perform(post("/api/v1/db/users")
                 .contentType(MediaType.APPLICATION_JSON)

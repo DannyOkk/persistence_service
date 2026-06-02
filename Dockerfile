@@ -16,7 +16,7 @@ COPY --from=base /root/.m2 /root/.m2
 COPY . .
 RUN mvn clean package -DskipTests -B
 
-FROM gcr.io/distroless/java21-debian13 AS runtime
+FROM gcr.io/distroless/java21-debian13:nonroot AS runtime   # cambio 1: :nonroot
 ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
 ENV JAVA_OPTS=""
 
@@ -26,4 +26,4 @@ WORKDIR /app
 COPY --from=builder /java/app/builder/target/app.jar /app/app.jar
 EXPOSE 8080
 
-CMD ["-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]   # cambio 2: CMD → ENTRYPOINT con java explícito

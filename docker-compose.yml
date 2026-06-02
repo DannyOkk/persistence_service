@@ -1,19 +1,33 @@
 services: 
-    _persistence-java:
-        _build: .
-        _image: notebookum-persistence-java:v1.0.0
-        _restart: unless-stopped
+    postgres-primary:
+        image: postgres:16
+        restart: unless-stopped
+        environment:
+        - POSTGRES_DB=${DB_NAME}
+        - POSTGRES_USER=${DB_USER}
+        - POSTGRES_PASSWORD=${DB_PASSWORD}
+        networks:
+        - internal-network
+        labels:
+        - "traefik.enable=false"
+
+    persistence-java:
+        build: .
+        image: notebookum-persistence-java:v1.0.0
+        restart: unless-stopped
+        depends_on:
+            - postgres-primary
         # LOAD BALANCER PATTERN
-        _deploy:
+        deploy:
             replicas: 2
-        _networks:
+        networks:
             notebookum-network:
                 aliases:
                     - persistence-java.universidad.localhost
             internal-network:
                 aliases:
                     - persistence-java-db
-        _labels:
+        labels:
             - "traefik.enable=true"
             - "traefik.http.routers.persistence-java.rule=Host(`persistence-java.universidad.localhost`)"
             - "traefik.http.routers.persistence-java.entryPoints=https"
@@ -24,7 +38,7 @@ services:
             # BULKHEAD PATTERN
             - "traefik.http.middlewares.bulkhead-persistence-java.inflightreq.amount=10"
             - "traefik.http.routers.persistence-java.middlewares=cb-persistence-java,bulkhead-persistence-java"
-        _environment:
+        environment:
             - PORT=8080
             - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
             - DB_WRITE_HOST=${DB_WRITE_HOST:-postgres-primary}
