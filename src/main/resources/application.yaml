@@ -1,6 +1,7 @@
 spring:
   application:
     name: persistence
+
   datasource:
     url: jdbc:postgresql://${DB_WRITE_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:notebookum_db}
     driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
@@ -15,16 +16,25 @@ spring:
       max-lifetime: 1800000
       test-query: SELECT 1
       initialization-fail-timeout: 10000
+
   jpa:
     database-platform: ${DB_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
-  data:
-    jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:validate}
+    show-sql: ${SHOW_SQL:true}
+    properties:
       hibernate:
-        ddl-auto: ${DDL_AUTO:validate}
-      show-sql: ${SHOW_SQL:true}
-      properties:
-        hibernate:
-          format_sql: ${FORMAT_SQL:false}
+        format_sql: ${FORMAT_SQL:false}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  sql:                              # ← agregado
+    init:
+      mode: always
+      schema-locations: classpath:init.sql
 
 management:
   endpoints:

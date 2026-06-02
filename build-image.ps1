@@ -1,6 +1,6 @@
 param(
-    [string]$ImageName = "persistence-java",
-    [string]$Tag = "latest",
+    [string]$ImageName = "notebookum-persistence-java",
+    [string]$Tag = "v1.0.0",
     [switch]$SkipTests
 )
 
@@ -24,9 +24,10 @@ if (-not (Test-Path ".\mvnw.cmd")) {
     exit 1
 }
 
-$mavenArgs = @("-DskipTests", "package")
-if (-not $SkipTests) {
-    $mavenArgs = @("package")
+# FIX: lógica de SkipTests estaba invertida
+$mavenArgs = @("package")
+if ($SkipTests) {
+    $mavenArgs = @("-DskipTests", "package")
 }
 
 Write-Info "Compilando el proyecto con Maven..."
