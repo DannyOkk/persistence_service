@@ -25,7 +25,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id)); // cambio: null → excepción
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found: " + id));
     }
 
     // ELIMINADO: findByEmailUser — cargaba todos los usuarios en memoria y filtraba en Java
@@ -33,7 +33,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findFirstByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email)); // cambio: null → excepción
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found: " + email));
     }
 
     @Transactional

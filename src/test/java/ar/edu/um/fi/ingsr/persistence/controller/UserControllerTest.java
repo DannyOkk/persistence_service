@@ -36,12 +36,16 @@ public class UserControllerTest {
     public void testCreateUserWithName() throws Exception {
         Map<String, String> payload = new HashMap<>();
         payload.put("email", "test@example.com");
-        payload.put("name", "John Doe");
+        payload.put("firstName", "John");
+        payload.put("lastName", "Doe");
+        payload.put("passwordHash", "hashedpass");
 
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setEmail("test@example.com");
-        mockUser.setName("John Doe");
+        mockUser.setFirstName("John");
+        mockUser.setLastName("Doe");
+        mockUser.setPasswordHash("hashedpass");
 
         when(userService.save(any(User.class))).thenReturn(mockUser);
 
@@ -50,7 +54,8 @@ public class UserControllerTest {
                 .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("John Doe"))
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.lastName").value("Doe"))
                 .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
@@ -70,14 +75,17 @@ public class UserControllerTest {
         User mockUser = new User();
         mockUser.setId(10L);
         mockUser.setEmail("user10@example.com");
-        mockUser.setName("Alice");
+        mockUser.setFirstName("Alice");
+        mockUser.setLastName("Wonderland");
+        mockUser.setPasswordHash("hash");
 
         when(userService.findById(10L)).thenReturn(mockUser);
 
         mockMvc.perform(get("/api/v1/db/users/10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(10))
-                .andExpect(jsonPath("$.name").value("Alice"))
+                .andExpect(jsonPath("$.firstName").value("Alice"))
+                .andExpect(jsonPath("$.lastName").value("Wonderland"))
                 .andExpect(jsonPath("$.email").value("user10@example.com"));
     }
 }

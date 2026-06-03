@@ -24,12 +24,19 @@ public class UserController {
     public User save(@Valid @RequestBody UserDTO userDTO) {
         User user = new User();
         user.setEmail(userDTO.getEmail());
-        user.setName(userDTO.getName());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setPasswordHash(userDTO.getPasswordHash());
         return userService.save(user);
     }
 
     @GetMapping("/{id}")
     public User findById(@PathVariable("id") Long id) {
         return userService.findById(id);
+    }
+
+    @GetMapping("/email/{email}")
+    public User findByEmail(@PathVariable("email") String email) {
+        return userService.findByEmail(email);
     }
 }

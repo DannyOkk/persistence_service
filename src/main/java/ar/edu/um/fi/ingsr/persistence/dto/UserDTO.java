@@ -10,6 +10,12 @@ public class UserDTO {
     @Email(message = "Debe ser un email válido")
     private String email;
 
-    @NotBlank(message = "El nombre no puede estar vacío")
-    private String name;
+    @NotBlank(message = "El primer nombre no puede estar vacío")
+    private String firstName;
+
+    @NotBlank(message = "El apellido no puede estar vacío")
+    private String lastName;
+
+    @NotBlank(message = "El password hash no puede estar vacío")
+    private String passwordHash;
 }
