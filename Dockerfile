@@ -16,7 +16,7 @@ COPY --from=base /root/.m2 /root/.m2
 COPY . .
 RUN mvn clean package -DskipTests -B
 
-FROM gcr.io/distroless/java21-debian13:nonroot AS runtime
+FROM eclipse-temurin:21-jre-alpine AS runtime
 ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
 
 WORKDIR /app
