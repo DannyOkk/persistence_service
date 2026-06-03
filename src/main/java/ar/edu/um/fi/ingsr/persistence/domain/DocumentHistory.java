@@ -1,5 +1,6 @@
 package ar.edu.um.fi.ingsr.persistence.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,10 +26,12 @@ public class DocumentHistory implements java.io.Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notebook_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Notebook notebook;
 
     @Column(name = "filename", nullable = false, length = 255)

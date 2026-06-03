@@ -1,5 +1,6 @@
 package ar.edu.um.fi.ingsr.persistence.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,6 +26,7 @@ public class Summary implements java.io.Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "document_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private DocumentHistory documentHistory;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
