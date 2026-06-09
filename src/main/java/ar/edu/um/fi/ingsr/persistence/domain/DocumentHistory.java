@@ -10,7 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -49,8 +51,20 @@ public class DocumentHistory implements java.io.Serializable {
     @Column(name = "extracted_text", columnDefinition = "TEXT")
     private String extractedText;
 
+    // SHA-256 hash del contenido del archivo para deduplicación
+    @Column(name = "content_hash", length = 64)
+    private String contentHash;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Versionado para control de concurrencia optimista
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public DocumentHistory() {
     }
@@ -64,5 +78,11 @@ public class DocumentHistory implements java.io.Serializable {
     @PrePersist
     void prePersist() {
         if (createdAt == null) createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

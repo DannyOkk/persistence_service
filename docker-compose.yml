@@ -1,4 +1,4 @@
-services: 
+services:
 
     # ─── BASE DE DATOS ────────────────────────────────────────────────────────
     postgres-primary:
@@ -13,7 +13,7 @@ services:
         labels:
             - "traefik.enable=false"
 
-    # FIX 1: Redis faltaba completamente — sin esto la app crashea al arrancar
+    # ─── REDIS ────────────────────────────────────────────────────────────────
     redis:
         image: redis:alpine
         restart: unless-stopped
@@ -29,7 +29,7 @@ services:
         restart: unless-stopped
         depends_on:
             - postgres-primary
-            - redis   # FIX 1: depender también de redis
+            - redis
         # LOAD BALANCER PATTERN
         deploy:
             replicas: 2
@@ -45,23 +45,29 @@ services:
             - "traefik.http.routers.persistence-java.rule=Host(`persistence-java.universidad.localhost`)"
             - "traefik.http.routers.persistence-java.entryPoints=https"
             - "traefik.http.routers.persistence-java.tls=true"
-            - "traefik.http.services.persistence-java.loadbalancer.server.port=8004"
+            - "traefik.http.services.persistence-java.loadbalancer.server.port=8080"
+            # CORS via Traefik
+            - "traefik.http.middlewares.cors-persistence.headers.accesscontrolalloworiginlist=*"
+            - "traefik.http.middlewares.cors-persistence.headers.accesscontrolallowmethods=GET,POST,PATCH,DELETE,OPTIONS"
+            - "traefik.http.middlewares.cors-persistence.headers.accesscontrolallowheaders=Content-Type,Authorization"
+            - "traefik.http.middlewares.cors-persistence.headers.addvaryheader=true"
             # CIRCUIT BREAKER PATTERN
             - "traefik.http.middlewares.cb-persistence-java.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100 || ResponseCodeRatio(500, 600, 0, 600) > 0.30 || NetworkErrorRatio() > 0.10"
             # BULKHEAD PATTERN
             - "traefik.http.middlewares.bulkhead-persistence-java.inflightreq.amount=10"
-            - "traefik.http.routers.persistence-java.middlewares=cb-persistence-java,bulkhead-persistence-java"
+            - "traefik.http.routers.persistence-java.middlewares=cb-persistence-java,bulkhead-persistence-java,cors-persistence"
         environment:
-            - PORT=8004
+            - PORT=8080
             - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
             - DB_WRITE_HOST=${DB_WRITE_HOST:-postgres-primary}
-            - DB_READ_HOST=${DB_READ_HOST:-postgres-primary}   # FIX 2: cambiado de "postgres-replica" (no existe) a "postgres-primary"
+            - DB_READ_HOST=${DB_READ_HOST:-postgres-primary}
             - DB_PORT=${DB_PORT:-5432}
             - DB_NAME=${DB_NAME}
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
-            - REDIS_HOST=redis        # FIX 3: necesario para que Spring se conecte al contenedor Redis
-            - REDIS_PORT=6379         # FIX 3: sin esto usa "localhost" y falla dentro de Docker
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - DDL_AUTO=update
 
 networks:
     notebookum-network:

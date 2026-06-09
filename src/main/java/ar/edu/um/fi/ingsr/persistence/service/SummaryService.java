@@ -1,6 +1,7 @@
 package ar.edu.um.fi.ingsr.persistence.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,24 +14,40 @@ import ar.edu.um.fi.ingsr.persistence.repository.SummaryRepository;
 @Service
 public class SummaryService {
 
-    private final SummaryRepository summaryRepository;             // cambio: inyección por constructor
+    private final SummaryRepository summaryRepository;
     private final DocumentHistoryRepository documentHistoryRepository;
 
-    public SummaryService(SummaryRepository summaryRepository,     // cambio: constructor
+    public SummaryService(SummaryRepository summaryRepository,
                           DocumentHistoryRepository documentHistoryRepository) {
         this.summaryRepository = summaryRepository;
         this.documentHistoryRepository = documentHistoryRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<Summary> getAll() {                                // cambio: @Transactional readOnly agregado
+    public List<Summary> getAll() {
         return summaryRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Summary findById(Integer id) {                          // cambio: @Transactional readOnly agregado
+    public Summary findById(Integer id) {
         return summaryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Summary not found: " + id)); // cambio: orElse(null) → orElseThrow
+                .orElseThrow(() -> new RuntimeException("Summary not found: " + id));
+    }
+
+    /**
+     * Obtener el resumen más reciente de un documento.
+     */
+    @Transactional(readOnly = true)
+    public Optional<Summary> findByDocumentId(Integer documentId) {
+        return summaryRepository.findTopByDocumentHistoryIdOrderByCreatedAtDesc(documentId);
+    }
+
+    /**
+     * Obtener historial de resúmenes de un documento (todas las versiones).
+     */
+    @Transactional(readOnly = true)
+    public List<Summary> findAllByDocumentId(Integer documentId) {
+        return summaryRepository.findByDocumentHistoryIdOrderByCreatedAtDesc(documentId);
     }
 
     @Transactional
@@ -51,7 +68,7 @@ public class SummaryService {
     @Transactional
     public Summary update(Integer id, SummaryDTO dto) {
         Summary summary = summaryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Summary not found: " + id)); // cambio: orElse(null) + if → orElseThrow
+                .orElseThrow(() -> new RuntimeException("Summary not found: " + id));
         if (dto.getDocumentId() != null) summary.setDocumentHistory(documentHistoryRepository.findById(dto.getDocumentId())
                 .orElseThrow(() -> new RuntimeException("Document not found: " + dto.getDocumentId())));
         if (dto.getContent() != null) summary.setContent(dto.getContent());
@@ -60,7 +77,7 @@ public class SummaryService {
     }
 
     @Transactional
-    public void deleteById(Integer id) {                           // cambio: @Transactional agregado
+    public void deleteById(Integer id) {
         summaryRepository.deleteById(id);
     }
 }

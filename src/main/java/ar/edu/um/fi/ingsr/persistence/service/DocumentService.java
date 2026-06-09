@@ -1,6 +1,7 @@
 package ar.edu.um.fi.ingsr.persistence.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +15,11 @@ import ar.edu.um.fi.ingsr.persistence.repository.UserRepository;
 @Service
 public class DocumentService {
 
-    private final DocumentHistoryRepository documentHistoryRepository;  // cambio: inyección por constructor
+    private final DocumentHistoryRepository documentHistoryRepository;
     private final UserRepository userRepository;
     private final NotebookRepository notebookRepository;
 
-    public DocumentService(DocumentHistoryRepository documentHistoryRepository,  // cambio: constructor
+    public DocumentService(DocumentHistoryRepository documentHistoryRepository,
                            UserRepository userRepository,
                            NotebookRepository notebookRepository) {
         this.documentHistoryRepository = documentHistoryRepository;
@@ -41,15 +42,16 @@ public class DocumentService {
         if (dto.getJobId() != null) doc.setJobId(dto.getJobId());
         if (dto.getStatus() != null) doc.setStatus(dto.getStatus());
         if (dto.getExtractedText() != null) doc.setExtractedText(dto.getExtractedText());
+        if (dto.getContentHash() != null) doc.setContentHash(dto.getContentHash());
         if (dto.getNotebookId() != null) doc.setNotebook(notebookRepository.findById(dto.getNotebookId())
-                .orElseThrow(() -> new RuntimeException("Notebook not found: " + dto.getNotebookId()))); // cambio: orElse(null) → orElseThrow
+                .orElseThrow(() -> new RuntimeException("Notebook not found: " + dto.getNotebookId())));
         return documentHistoryRepository.saveAndFlush(doc);
     }
 
     @Transactional
     public DocumentHistory update(Integer id, DocumentDTO dto) {
         DocumentHistory doc = documentHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found: " + id)); // cambio: orElse(null) + if → orElseThrow
+                .orElseThrow(() -> new RuntimeException("Document not found: " + id));
         if (dto.getUserId() != null) doc.setUser(userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserId())));
         if (dto.getFilename() != null) doc.setFilename(dto.getFilename());
@@ -57,20 +59,37 @@ public class DocumentService {
         if (dto.getJobId() != null) doc.setJobId(dto.getJobId());
         if (dto.getStatus() != null) doc.setStatus(dto.getStatus());
         if (dto.getExtractedText() != null) doc.setExtractedText(dto.getExtractedText());
+        if (dto.getContentHash() != null) doc.setContentHash(dto.getContentHash());
         if (dto.getNotebookId() != null) doc.setNotebook(notebookRepository.findById(dto.getNotebookId())
-                .orElseThrow(() -> new RuntimeException("Notebook not found: " + dto.getNotebookId()))); // cambio: orElse(null) → orElseThrow
+                .orElseThrow(() -> new RuntimeException("Notebook not found: " + dto.getNotebookId())));
         return documentHistoryRepository.saveAndFlush(doc);
     }
 
     @Transactional(readOnly = true)
     public DocumentHistory findById(Integer id) {
         return documentHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found: " + id)); // cambio: orElse(null) → orElseThrow
+                .orElseThrow(() -> new RuntimeException("Document not found: " + id));
     }
 
     @Transactional(readOnly = true)
     public List<DocumentHistory> findAll() {
         return documentHistoryRepository.findAll();
+    }
+
+    /**
+     * Buscar documento por hash SHA-256 del contenido.
+     */
+    @Transactional(readOnly = true)
+    public Optional<DocumentHistory> findByContentHash(String contentHash) {
+        return documentHistoryRepository.findByContentHash(contentHash);
+    }
+
+    /**
+     * Buscar documentos por ID de usuario.
+     */
+    @Transactional(readOnly = true)
+    public List<DocumentHistory> findByUserId(Long userId) {
+        return documentHistoryRepository.findByUserId(userId);
     }
 
     @Transactional

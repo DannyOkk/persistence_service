@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8004}
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -23,7 +23,7 @@ spring:
   jpa:
     database-platform: ${DB_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
     hibernate:
-      ddl-auto: ${DDL_AUTO:validate}
+      ddl-auto: ${DDL_AUTO:update}
     show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:

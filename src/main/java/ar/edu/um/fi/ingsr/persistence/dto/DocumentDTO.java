@@ -19,4 +19,7 @@ public class DocumentDTO {
     private String status;
     private String extractedText;
     private Long notebookId;
+
+    // SHA-256 hash del contenido del archivo para deduplicación
+    private String contentHash;
 }
