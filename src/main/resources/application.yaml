@@ -34,6 +34,23 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:consul}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        service-name: persistence-service
+        health-check-path: /actuator/health
+        health-check-interval: 15s
+        prefer-ip-address: true
+        tags:
+          - "traefik.enable=true"
+          - "traefik.http.routers.persistence-service.rule=Host(`persistence-java.universidad.localhost`)"
+          - "traefik.http.routers.persistence-service.entryPoints=http,https"
+          - "traefik.http.services.persistence-service.loadbalancer.server.port=8080"
+      config:
+        enabled: false
+
   sql:                              # ← agregado
     init:
       mode: always

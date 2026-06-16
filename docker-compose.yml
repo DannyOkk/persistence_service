@@ -40,22 +40,6 @@ services:
             internal-network:
                 aliases:
                     - persistence-java-db
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.persistence-java.rule=Host(`persistence-java.universidad.localhost`)"
-            - "traefik.http.routers.persistence-java.entryPoints=https"
-            - "traefik.http.routers.persistence-java.tls=true"
-            - "traefik.http.services.persistence-java.loadbalancer.server.port=8080"
-            # CORS via Traefik
-            - "traefik.http.middlewares.cors-persistence.headers.accesscontrolalloworiginlist=*"
-            - "traefik.http.middlewares.cors-persistence.headers.accesscontrolallowmethods=GET,POST,PATCH,DELETE,OPTIONS"
-            - "traefik.http.middlewares.cors-persistence.headers.accesscontrolallowheaders=Content-Type,Authorization"
-            - "traefik.http.middlewares.cors-persistence.headers.addvaryheader=true"
-            # CIRCUIT BREAKER PATTERN
-            - "traefik.http.middlewares.cb-persistence-java.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100 || ResponseCodeRatio(500, 600, 0, 600) > 0.30 || NetworkErrorRatio() > 0.10"
-            # BULKHEAD PATTERN
-            - "traefik.http.middlewares.bulkhead-persistence-java.inflightreq.amount=10"
-            - "traefik.http.routers.persistence-java.middlewares=cb-persistence-java,bulkhead-persistence-java,cors-persistence"
         environment:
             - PORT=8080
             - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
@@ -68,6 +52,9 @@ services:
             - REDIS_HOST=redis
             - REDIS_PORT=6379
             - DDL_AUTO=update
+            # Consul Service Discovery
+            - CONSUL_HOST=consul
+            - CONSUL_PORT=8500
 
 networks:
     notebookum-network:
