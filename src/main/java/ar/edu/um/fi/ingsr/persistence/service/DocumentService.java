@@ -34,6 +34,13 @@ public class DocumentService {
 
     @Transactional
     public DocumentHistory create(DocumentDTO dto) {
+        if (dto.getContentHash() != null) {
+            Optional<DocumentHistory> existing = documentHistoryRepository.findByContentHash(dto.getContentHash());
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+        }
+
         DocumentHistory doc = new DocumentHistory();
         doc.setUser(userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserId())));
