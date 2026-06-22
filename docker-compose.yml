@@ -10,8 +10,6 @@ services:
             - POSTGRES_PASSWORD=${DB_PASSWORD}
         networks:
             - internal-network
-        labels:
-            - "traefik.enable=false"
 
     # ─── REDIS ────────────────────────────────────────────────────────────────
     redis:
@@ -19,8 +17,6 @@ services:
         restart: unless-stopped
         networks:
             - internal-network
-        labels:
-            - "traefik.enable=false"
 
     # ─── APLICACIÓN ──────────────────────────────────────────────────────────
     persistence-java:
@@ -41,20 +37,10 @@ services:
                 aliases:
                     - persistence-java-db
         environment:
-            - PORT=8080
-            - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
-            - DB_WRITE_HOST=${DB_WRITE_HOST:-postgres-primary}
-            - DB_READ_HOST=${DB_READ_HOST:-postgres-primary}
-            - DB_PORT=${DB_PORT:-5432}
-            - DB_NAME=${DB_NAME}
-            - DB_USER=${DB_USER}
-            - DB_PASSWORD=${DB_PASSWORD}
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - DDL_AUTO=update
-            # Consul Service Discovery
+            # Toda la configuración viene de Consul KV
             - CONSUL_HOST=consul
             - CONSUL_PORT=8500
+            - CONSUL_TOKEN=2be22662-4819-4a0c-81d9-b3f50c4c389c
 
 networks:
     notebookum-network:

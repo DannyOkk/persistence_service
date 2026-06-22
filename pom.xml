@@ -100,10 +100,14 @@
 			<version>2.8.6</version>
 		</dependency>
 
-		<!-- Consul Service Discovery -->
+		<!-- Consul Service Discovery & Config -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-consul-discovery</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-consul-config</artifactId>
 		</dependency>
 
 		<!-- Dev / Test -->

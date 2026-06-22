@@ -43,13 +43,21 @@ spring:
         health-check-path: /actuator/health
         health-check-interval: 15s
         prefer-ip-address: true
+        # Tags are loaded from Consul KV at startup (no hardcoded labels)
         tags:
-          - "traefik.enable=true"
-          - "traefik.http.routers.persistence-service.rule=Host(`persistence-java.universidad.localhost`)"
-          - "traefik.http.routers.persistence-service.entryPoints=http,https"
-          - "traefik.http.services.persistence-service.loadbalancer.server.port=8080"
+          - "traefik.enable=${TRAEFIK_ENABLE:true}"
+          - "traefik.http.routers.persistence-service.rule=${TRAEFIK_ROUTER_RULE:Host(`persistence-java.universidad.localhost`)}"
+          - "traefik.http.routers.persistence-service.entryPoints=${TRAEFIK_ENTRYPOINTS:http,https}"
+          - "traefik.http.services.persistence-service.loadbalancer.server.port=${TRAEFIK_LB_PORT:8080}"
       config:
-        enabled: false
+        enabled: true
+        prefix: config
+        defaultContext: persistence-service
+        format: KEY_VALUE
+        data-key: ""
+
+  config:
+    import: "consul:"
 
   sql:                              # ← agregado
     init:
