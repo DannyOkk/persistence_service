@@ -22,6 +22,8 @@ ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
 WORKDIR /app
 
 COPY --from=builder /java/app/builder/target/app.jar /app/app.jar
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/app/entrypoint.sh"]

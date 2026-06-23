@@ -1,49 +1,17 @@
 services:
-
-    # ─── BASE DE DATOS ────────────────────────────────────────────────────────
-    postgres-primary:
-        image: postgres:16
-        restart: unless-stopped
-        environment:
-            - POSTGRES_DB=${DB_NAME}
-            - POSTGRES_USER=${DB_USER}
-            - POSTGRES_PASSWORD=${DB_PASSWORD}
-        networks:
-            - internal-network
-
-    # ─── REDIS ────────────────────────────────────────────────────────────────
-    redis:
-        image: redis:alpine
-        restart: unless-stopped
-        networks:
-            - internal-network
-
-    # ─── APLICACIÓN ──────────────────────────────────────────────────────────
-    persistence-java:
-        build: .
-        image: notebookum-persistence-java:v1.0.0
-        restart: unless-stopped
-        depends_on:
-            - postgres-primary
-            - redis
-        # LOAD BALANCER PATTERN
-        deploy:
-            replicas: 2
-        networks:
-            notebookum-network:
-                aliases:
-                    - persistence-java.universidad.localhost
-            internal-network:
-                aliases:
-                    - persistence-java-db
-        environment:
-            # Toda la configuración viene de Consul KV
-            - CONSUL_HOST=consul
-            - CONSUL_PORT=8500
-            - CONSUL_TOKEN=2be22662-4819-4a0c-81d9-b3f50c4c389c
+  persistence:
+    build: .
+    image: notebookum-persistence:v1.0.0
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+    networks:
+      notebookum-network:
+        aliases:
+          - persistence-java.universidad.localhost
+    environment:
+      - CONSUL_URL=http://consul:8500
 
 networks:
-    notebookum-network:
-        external: true
-    internal-network:
-        internal: true
+  notebookum-network:
+    external: true
